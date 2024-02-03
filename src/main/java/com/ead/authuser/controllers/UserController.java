@@ -72,7 +72,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userModel);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/{userId}/password")
     public ResponseEntity<Object> updatePassword(
             @PathVariable(value = "userId") UUID userId,
             @RequestBody @JsonView(UserDto.UserView.PasswordPut.class) UserDto dto
@@ -94,7 +94,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("Password updated successfully.");
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/{userId}/image")
     public ResponseEntity<Object> updateImage(
             @PathVariable(value = "userId") UUID userId,
             @RequestBody @JsonView(UserDto.UserView.ImagePut.class) UserDto dto
