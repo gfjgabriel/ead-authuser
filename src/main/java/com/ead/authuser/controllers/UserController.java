@@ -5,6 +5,7 @@ import com.ead.authuser.models.UserModel;
 import com.ead.authuser.services.UserService;
 import com.ead.authuser.specifications.SpecificationTemplate;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Log4j2
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/users")
@@ -64,11 +66,14 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable(value = "userId") UUID userId) {
+        log.debug("DELETE deleteUser userId received {}", userId);
         Optional<UserModel> userModelOptional = userService.findById(userId);
         if (userModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         userService.delete(userModelOptional.get());
+        log.debug("DELETE deleteUser userId deleted {}", userId);
+        log.info("User deleted successfully userId {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body("User successfully deleted");
     }
 
@@ -77,6 +82,7 @@ public class UserController {
             @PathVariable(value = "userId") UUID userId,
             @RequestBody @Validated({UserDto.UserView.UserPut.class}) @JsonView(UserDto.UserView.UserPut.class) UserDto dto
     ) {
+        log.debug("PUT updateUser userDto received {}", dto);
         Optional<UserModel> userModelOptional = userService.findById(userId);
         if (userModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -87,7 +93,8 @@ public class UserController {
         userModel.setCpf(dto.getCpf());
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
         userService.save(userModel);
-
+        log.debug("POST updateUser userDto saved {}", userModel);
+        log.info("User updated successfully userId {}", userModel.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(userModel);
     }
 
@@ -102,6 +109,7 @@ public class UserController {
         }
         var userModel = userModelOptional.get();
         if (!userModel.getPassword().equals(dto.getOldPassword())) {
+            log.warn("Old password mismatch userId {}", userId);
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Old password mismatch!");
         }
 
