@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -43,9 +44,15 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<UserModel>> getAllUsers(
             SpecificationTemplate.UserSpec spec,
-            @PageableDefault(sort = "userId", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(sort = "userId", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) UUID courseId
     ) {
-        Page<UserModel> page = userService.findAll(spec, pageable);
+        Page<UserModel> page;
+        if (courseId == null) {
+            page = userService.findAll(spec, pageable);
+        } else {
+            page = userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable);
+        }
         for (UserModel user : page.toList()) {
             user.add(
                     WebMvcLinkBuilder.linkTo(
