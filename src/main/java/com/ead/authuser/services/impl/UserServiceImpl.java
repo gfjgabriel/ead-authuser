@@ -1,7 +1,9 @@
 package com.ead.authuser.services.impl;
 
 import com.ead.authuser.clients.CourseClient;
+import com.ead.authuser.enums.ActionType;
 import com.ead.authuser.models.UserModel;
+import com.ead.authuser.publishers.UserEventPublisher;
 import com.ead.authuser.repositories.UserRepository;
 import com.ead.authuser.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     CourseClient courseClient;
+
+    @Autowired
+    UserEventPublisher userEventPublisher;
 
     @Override
     public Page<UserModel> findAll(Specification<UserModel> spec, Pageable pageable) {
@@ -58,5 +63,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Transactional
+    @Override
+    public UserModel saveUser(UserModel userModel) {
+        userModel = userRepository.save(userModel);
+        userEventPublisher.publisherUserEvent(userModel.convertToUserEventDto(), ActionType.CREATE);
+        return userModel;
+    }
+
+    @Transactional
+    @Override
+    public UserModel updateUser(UserModel userModel) {
+        userModel = userRepository.save(userModel);
+        userEventPublisher.publisherUserEvent(userModel.convertToUserEventDto(), ActionType.UPDATE);
+        return userModel;
+    }
+
+    @Transactional
+    @Override
+    public void deleteUser(UserModel userModel) {
+        userRepository.delete(userModel);
+        userEventPublisher.publisherUserEvent(userModel.convertToUserEventDto(), ActionType.DELETE);
+    }
+
+    @Override
+    public UserModel updatePassword(UserModel userModel) {
+        return userRepository.save(userModel);
     }
 }

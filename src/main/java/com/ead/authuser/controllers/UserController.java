@@ -69,7 +69,7 @@ public class UserController {
         if (userModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        userService.delete(userModelOptional.get());
+        userService.deleteUser(userModelOptional.get());
         log.debug("DELETE deleteUser userId deleted {}", userId);
         log.info("User deleted successfully userId {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body("User successfully deleted");
@@ -90,7 +90,7 @@ public class UserController {
         userModel.setPhoneNumber(dto.getPhoneNumber());
         userModel.setCpf(dto.getCpf());
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-        userService.save(userModel);
+        userService.updateUser(userModel);
         log.debug("POST updateUser userDto userId {}", userModel.getUserId());
         log.info("User updated successfully userId {}", userModel.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(userModel);
@@ -114,7 +114,7 @@ public class UserController {
         userModel.setPassword(dto.getPassword());
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
 
-        userService.save(userModel);
+        userService.updatePassword(userModel);
         log.debug("POST updateUser userDto userId {}", userModel.getUserId());
         log.info("User updated successfully userId {}", userModel.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body("Password updated successfully.");
@@ -134,7 +134,7 @@ public class UserController {
         userModel.setImageUrl(dto.getImageUrl());
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
 
-        userService.save(userModel);
+        userService.updateUser(userModel);
         log.debug("POST updateUser userDto userId {}", userModel.getUserId());
         log.info("User updated successfully userId {}", userModel.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(userModel);
