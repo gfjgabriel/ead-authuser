@@ -25,7 +25,6 @@ spring:
   rabbitmq:
     addresses: amqps://akfqarag:tbY1y22ne27yDy8P4YhyVaTzVVJq5S9O@woodpecker.rmq.cloudamqp.com/akfqarag
 
-
 logging:
   level:
     com.ead: TRACE
@@ -47,3 +46,19 @@ eureka:
       default-zone: 'http://localhost:8761/eureka'
   instance:
     hostname: localhost
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      circuitBreakerInstance:
+        sliding-window-size: 30
+        permitted-number-of-calls-in-half-open-state: 2
+        sliding-window-type: TIME_BASED
+        minimum-number-of-calls: 2
+        wait-duration-in-open-state: 30s
+        failure-rate-threshold: 80
+  retry:
+    instances:
+      retryInstance:
+        maxAttempts: 3
+        waitDuration: 5s
