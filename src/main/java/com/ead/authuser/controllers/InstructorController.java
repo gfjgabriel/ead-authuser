@@ -2,8 +2,11 @@ package com.ead.authuser.controllers;
 
 import com.ead.authuser.dtos.InstructorDto;
 import com.ead.authuser.dtos.UserDto;
+import com.ead.authuser.enums.RoleType;
 import com.ead.authuser.enums.UserType;
+import com.ead.authuser.models.RoleModel;
 import com.ead.authuser.models.UserModel;
+import com.ead.authuser.services.RoleService;
 import com.ead.authuser.services.UserService;
 import com.ead.authuser.specifications.SpecificationTemplate;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -43,15 +46,21 @@ public class InstructorController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    RoleService roleService;
+
     @PostMapping("/subscription")
     public ResponseEntity<Object> saveSubscriptionInstructor(@RequestBody @Valid InstructorDto instructorDto) {
         Optional<UserModel> userModelOptional = userService.findById(instructorDto.getUserId());
         if (userModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+        RoleModel roleModel = roleService.findByRoleName(RoleType.ROLE_INSTRUCTOR)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
         UserModel userModel = userModelOptional.get();
         userModel.setUserType(UserType.INSTRUCTOR);
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        userModel.getRoles().add(roleModel);
         userService.updateUser(userModel);
         return ResponseEntity.status(HttpStatus.OK).body(userModel);
     }
