@@ -19,6 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +50,7 @@ public class InstructorController {
     @Autowired
     RoleService roleService;
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/subscription")
     public ResponseEntity<Object> saveSubscriptionInstructor(@RequestBody @Valid InstructorDto instructorDto) {
         Optional<UserModel> userModelOptional = userService.findById(instructorDto.getUserId());
